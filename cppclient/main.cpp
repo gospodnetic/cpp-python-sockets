@@ -1,3 +1,4 @@
+
 //
 //  main.cpp
 //
@@ -6,6 +7,7 @@
 //
 
 #include <iostream>
+#include "socket.h"
 #include "socket.hpp"
 
 using namespace std;
@@ -13,10 +15,12 @@ using namespace serversock;
 
 struct serversock::objectData data;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) 
+{
     objectData *pointer = &data;
     serversock::createConnection();
-    while (1 == 1) {
+    while (1 == 1) 
+    {
         serversock::readValues(pointer);
     }
     return 0;

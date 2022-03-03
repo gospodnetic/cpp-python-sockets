@@ -1,3 +1,4 @@
+
 //
 //  socket.hpp
 //
@@ -5,8 +6,7 @@
 //  Copyright © 2019 Johnathan Chiu. All rights reserved.
 //
 
-#ifndef socket_hpp
-#define socket_hpp
+#pragma once
 
 #include <stdio.h>
 #include <iostream>
@@ -15,18 +15,15 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#endif /* socket_hpp */
+namespace serversock 
+{
 
-namespace serversock {
-    
-    struct objectData {
+    struct objectData 
+    {
         unsigned int value;
     };
     
     void createConnection();
     int readValues(objectData *a);
-
-}
-
-
-
+    
+} // namespace serversock 

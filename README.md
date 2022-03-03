@@ -1,3 +1,11 @@
+
+# Updated version notes
+
+### Usage:
+1. Build `cppclient`: `g++ main.cpp -o main`
+2. Run `pythonserver`: `python3 simplesocket`
+3. Run `cppclient`: `./main`
+
 # Cpp-Python-Sockets
 
 Python server with a c++ client. This utility is useful when you want to merge c++ code with python.
