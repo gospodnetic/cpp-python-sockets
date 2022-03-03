@@ -10,9 +10,9 @@
 
 #include <stdio.h>
 #include <iostream>
-#include <cstring>
-#include <arpa/inet.h>
-#include <sys/socket.h>
+#include <cstring> // memcpy()
+#include <arpa/inet.h> // https://pubs.opengroup.org/onlinepubs/7908799/xns/arpainet.h.html
+#include <sys/socket.h> // https://pubs.opengroup.org/onlinepubs/007904975/basedefs/sys/socket.h.html e.g. recv()
 #include <unistd.h>
 
 namespace serversock 
@@ -24,6 +24,8 @@ namespace serversock
     };
     
     void createConnection();
+    void close_connection();
     int readValues(objectData *a);
-    
+    int send_values(objectData *data);
+
 } // namespace serversock 

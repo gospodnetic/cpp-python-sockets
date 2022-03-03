@@ -3,7 +3,7 @@
 
 ### Usage:
 1. Build `cppclient`: `g++ main.cpp -o main`
-2. Run `pythonserver`: `python3 simplesocket`
+2. Run `pythonserver`: `python3 simplesocket.py`
 3. Run `cppclient`: `./main`
 
 # Cpp-Python-Sockets

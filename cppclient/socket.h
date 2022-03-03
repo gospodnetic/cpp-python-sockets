@@ -18,14 +18,16 @@ using namespace serversock;
 
 int sockfd, n;
 struct sockaddr_in serv_addr;
-char buffer[256];
+char buffer[1024];
+
+// https://www.bogotobogo.com/cplusplus/sockets_server_client.php
+// https://www.geeksforgeeks.org/socket-programming-cc/
 
 void serversock::createConnection() 
 {
-    
-    /* Create a socket point */
+    // Create socket (file descriptor - fd).
+    // domain=AF_INET, type (tcp=SOCK_STREAM/udp=SOCK_DGRAM), protocol=0
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    
     if (sockfd < 0) 
     {
         perror("ERROR opening socket");
@@ -34,14 +36,16 @@ void serversock::createConnection()
         cout << "SOCKET OPENED" << endl;
     }
     
+    // Create connection to socket.
+    // Specifies the address family, usually the constant AF_INET (IPv4)
     serv_addr.sin_family = AF_INET;
+    // Specifies the port number and must be used with htons() function that converts the host byte order to network byte order
     serv_addr.sin_port = htons(atoi(PORT));
+    // sin_addr = holds the IP address returned by inet_addr() to be used in the socket connection
     inet_pton(AF_INET, IP, &(serv_addr.sin_addr.s_addr));
-    
     cout << "attempting to connect to server" << endl;
-    
+    // fd=sockfd, remote_host=serv_addr, addr_length=sizeof(serv_addr)
     int conn_success = connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-    
     if (conn_success < 0) 
     {
         perror("ERROR connecting");
@@ -49,6 +53,12 @@ void serversock::createConnection()
     {
         cout << "connection successful" << endl;
     }
+}
+
+void serversock::close_connection()
+{
+    close(sockfd);
+    cout << "Connection closed" << endl;
 }
 
 int serversock::readValues(objectData *a) 
@@ -64,19 +74,41 @@ int serversock::readValues(objectData *a)
     
     if (FD_ISSET(sockfd, &fds)) 
     {
-        /* The socket_fd has data available to be read */
+        // Receive a message from a connection  (connected sockets)
+        // ARGS: socket file descriptor, buffer for storing message, length of buffer, flags
+        // RETURN: return the length of the message written to the buffer 
         n = recv(sockfd, buffer, sizeof(buffer), 0);
-        cout << "Client received: " << n << endl;
+        cout << "Client received buffer with the lenght of: " << n << endl;
         if (n != sizeof(struct objectData)) 
         {
+            cout << "Received data not valid!" << endl;
             return 0;
         }
         struct objectData data = *((struct objectData *) buffer);
         *a = *((struct objectData *) buffer);
-        cout << a->value << endl;
+        cout << "Human readable received buffer value: " << a->value << endl;
     } else 
     {
         //cout << "nothing received" << endl;
     }
+    return 0;
+}
+
+int serversock::send_values(objectData *data)
+{
+    // Pack data to buffer.
+    memcpy(buffer, data, sizeof(*data));
+    // Sent to server.
+    n = send(sockfd, buffer, sizeof(struct objectData), 0);
+    if (n < 0) // or n != sizeof(struct objectData)?
+    {
+        cout << "Sent data not valid!" << endl;
+        cout << "ERROR writing to socket" << endl;
+    }
+    else
+    {
+        cout << "Data sent!" << endl;
+    }
+        
     return 0;
 }
