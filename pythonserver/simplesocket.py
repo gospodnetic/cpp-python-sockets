@@ -42,7 +42,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as server_socket:
             # Read recv() data.
             data = connection.recv(RECV_BUFFER_SIZE)
             bytes_encoding = json.detect_encoding(data)
-            txt = data.decode(bytes_encoding)
+            try:
+                txt = data.decode(bytes_encoding)
+            except:
+                txt = "IMAGE"
             # Based on prefix decide:
             if txt.startswith("SIZE"):
                 tmp = txt.split(" ")
@@ -50,7 +53,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as server_socket:
                 image_height = int(tmp[2])
                 image_size = image_width * image_height
                 print("Client sent image size:", image_width, image_height)
-                connection.sendall(pack_string("GOT SIZE"))
+                connection.sendall(pack_string("GOT SIZE\n"))
                 # NOW set new buffer size because we are expecting image in the next recv()!
                 RECV_BUFFER_SIZE = image_size
             elif txt.startswith("BYE"):
@@ -59,16 +62,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as server_socket:
                 break
             else:
                 # In this case "data" contains image!
-                print(data)
+                #print(data)
                 print("Client sent image!")
-                connection.sendall(pack_string("GOT IMAGE"))
+                connection.sendall(pack_string("GOT IMAGE\n"))
                 # Perform processing on image.
                 # TODO...
                 print("Server is processing image...")
                 print("Image processing done!")
                 # Send image back.
-                # TODO.
-                print("Sending image back to the client")
+                print("Sending image back to the client...")
+                connection.sendall(data)
                 # NOW return the old buffer size because we can expect "SIZE" or "BYE" in next recv()!
                 RECV_BUFFER_SIZE = 1024
                 # sock.shutdown() here and new connection start in while loop?

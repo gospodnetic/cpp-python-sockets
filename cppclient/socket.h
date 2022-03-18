@@ -110,6 +110,14 @@ int serversock::read_values()
     return n;
 }
 
+int serversock::read_values(uint8_t *data, int data_size)
+{
+    uint8_t *buffer = new uint8_t[data_size];
+    n = recv(sockfd, buffer, sizeof(buffer), 0);
+    *data = *((uint8_t *)buffer);
+    return n;
+}
+
 int serversock::send_values(objectData *data)
 {
     // Pack data to buffer.
@@ -133,7 +141,7 @@ int serversock::send_values(objectData *data)
 int serversock::send_values(string data)
 {
     char buffer[1024];
-    memcpy(buffer, data.c_str(),data.size());
+    memcpy(buffer, data.c_str(), data.size());
     n = send(sockfd, buffer, data.size(), 0);
     return n;
 }
@@ -142,8 +150,7 @@ int serversock::send_values(uint8_t *data, int data_size)
 {
     //std::vector<uint8_t> buffer(data_size);
     uint8_t *buffer = new uint8_t[data_size];
-    cout << data_size << endl;
-    memcpy(buffer, data, data_size);
-    n = send(sockfd, buffer, data_size, 0);
+    memcpy(buffer, data, sizeof(*data));
+    n = send(sockfd, buffer, sizeof(*data), 0);
     return n;
 }

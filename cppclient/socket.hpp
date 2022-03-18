@@ -29,6 +29,7 @@ namespace serversock
     void close_connection();
     int readValues(objectData *a);
     int read_values();
+    int read_values(uint8_t *data, int data_size);
     int send_values(objectData *data);
     int send_values(std::string data);
     int send_values(uint8_t *data, int data_size);

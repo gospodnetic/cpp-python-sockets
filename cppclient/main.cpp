@@ -55,10 +55,10 @@ int main(int argc, char *argv[])
     cout << "Sending image to server..." << endl;
     int img_size = width * height;
     // TODO.
-    string dummy = "DUMMY";
-    serversock::send_values(dummy);
+    //string dummy = "DUMMY";
+    //serversock::send_values(dummy);
     // TODO: following function is not correctly creating bytearray!
-    //int n = serversock::send_values(rgb_image, img_size);
+    int n = serversock::send_values(rgb_image, img_size);
 
     // Wait for server to confirm that image has been received.
     cout << "Waiting for server image confirmation..." << endl;
@@ -74,11 +74,14 @@ int main(int argc, char *argv[])
 
 
     // Wait for image from server.
+    cout <<  "Waiting for image from server..." << endl;
     server_listen = true;
     while(server_listen)
     {
         // TODO: int msg_size = serversock::read_values();
-        int msg_size = 1;
+        uint8_t *data;
+        int msg_size = read_values(data, img_size);
+        
         if (msg_size > 0)
         {
             server_listen = false;
@@ -87,13 +90,16 @@ int main(int argc, char *argv[])
     }
 
     // Send message for closing connection.
-    string close_message = "BYE"; // note: this is predefined message know on server side.
+    string close_message = "BYE\n"; // note: this is predefined message know on server side.
     cout << "Sending closing msg: " << close_message << " to server...." << endl;
     serversock::send_values(close_message);
 
     // Close connection.
     cout << "Closing connection and exiting..." << endl;
     serversock::close_connection();
+
+    // TODO: write image...
+    
     return 0;
 
 }
