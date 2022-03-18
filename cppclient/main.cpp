@@ -25,7 +25,7 @@ struct serversock::objectData data;
 int main(int argc, char *argv[]) 
 {
     // Read image.
-    string path = "../client_data/IEEE_spring.png";
+    string path = "../client_data/bunny.png";
     uint8_t* rgb_image;
     int width, height, bpp;
     read_image(path, rgb_image, &width, &height, &bpp);
