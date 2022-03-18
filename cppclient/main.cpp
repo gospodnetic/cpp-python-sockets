@@ -6,9 +6,14 @@
 //  Copyright © 2019 Johnathan Chiu. All rights reserved.
 //
 
-#include <iostream>
+// Application includes.
 #include "socket.h"
 #include "socket.hpp"
+
+// STL includes.
+#include <iostream>
+#include <string>
+
 
 using namespace std;
 using namespace serversock;
@@ -20,21 +25,47 @@ int main(int argc, char *argv[])
     // Create connection.
     serversock::createConnection();
 
-    // Create our data.
-    struct serversock::objectData data_to_send;
-    data_to_send.value = 101;
-    cout << "Human readable data to send: " << data_to_send.value << endl;
+    // Send the size of time image.
+    int size = 1024 * 1024;
+    cout << "Sending image size: " << size << " to server..." << endl;
+    string size_message = "SIZE " + to_string(size) + "\n";
+    serversock::send_values(size_message);
 
-    // Send data to server.
-    serversock::send_values(&data_to_send);
-
-    // Read data from server.
-    objectData data_to_receive;
-    while (1 == 1) 
+    // Listen for server response.
+    bool server_listen = true;
+    while(server_listen)
     {
-        serversock::readValues(&data_to_receive);
+        int msg_size = serversock::read_values();
+        if (msg_size > 0)
+        {
+            server_listen = false;
+        }
     }
-    // cout << "Human readable received buffer value: " << data_to_receive.value << endl;
+
+    // Send image.
+    // TODO.
+    cout << "Sending image to server..." << endl;
+
+    // Wait for image from server.
+    server_listen = true;
+    while(server_listen)
+    {
+        // TODO: int msg_size = serversock::read_values();
+        int msg_size = 1;
+        if (msg_size > 0)
+        {
+            server_listen = false;
+            cout << "Got image back from server!" << endl;
+        }
+    }
+
+    // Send message for closing connection.
+    string close_message = "BYE"; // note: this is predefined message know on server side.
+    cout << "Sending closing msg: " << close_message << " to server...." << endl;
+    serversock::send_values(close_message);
+
+    // Close connection.
+    cout << "Closing connection and exiting..." << endl;
     serversock::close_connection();
     return 0;
 }

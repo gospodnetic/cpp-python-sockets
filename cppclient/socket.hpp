@@ -14,18 +14,23 @@
 #include <arpa/inet.h> // https://pubs.opengroup.org/onlinepubs/7908799/xns/arpainet.h.html
 #include <sys/socket.h> // https://pubs.opengroup.org/onlinepubs/007904975/basedefs/sys/socket.h.html e.g. recv()
 #include <unistd.h>
+#include <string>
 
 namespace serversock 
 {
 
     struct objectData 
     {
+        const char *size_info;
         unsigned int value;
     };
     
     void createConnection();
     void close_connection();
     int readValues(objectData *a);
+    int read_values();
     int send_values(objectData *data);
+    int send_values(std::string data);
+    
 
 } // namespace serversock 

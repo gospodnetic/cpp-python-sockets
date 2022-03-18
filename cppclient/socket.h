@@ -9,6 +9,7 @@
 # pragma once
 
 #include "socket.hpp"
+#include <string>
 
 #define PORT "8080"
 #define IP "127.0.0.1"
@@ -20,8 +21,10 @@ int sockfd, n;
 struct sockaddr_in serv_addr;
 char buffer[1024];
 
+// Useful links:
 // https://www.bogotobogo.com/cplusplus/sockets_server_client.php
 // https://www.geeksforgeeks.org/socket-programming-cc/
+// https://stackoverflow.com/questions/3125080/sending-images-over-c-sockets-linux
 
 void serversock::createConnection() 
 {
@@ -43,7 +46,7 @@ void serversock::createConnection()
     serv_addr.sin_port = htons(atoi(PORT));
     // sin_addr = holds the IP address returned by inet_addr() to be used in the socket connection
     inet_pton(AF_INET, IP, &(serv_addr.sin_addr.s_addr));
-    cout << "attempting to connect to server" << endl;
+    cout << "Attempting to connect to server..." << endl;
     // fd=sockfd, remote_host=serv_addr, addr_length=sizeof(serv_addr)
     int conn_success = connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
     if (conn_success < 0) 
@@ -51,7 +54,7 @@ void serversock::createConnection()
         perror("ERROR connecting");
     } else 
     {
-        cout << "connection successful" << endl;
+        cout << "Connection successful!" << endl;
     }
 }
 
@@ -94,6 +97,16 @@ int serversock::readValues(objectData *a)
     return 0;
 }
 
+// Short messages communication.
+int serversock::read_values()
+{
+    char buffer[1024];
+    n = recv(sockfd, buffer, sizeof(buffer), 0);
+    string str_data(buffer, n);
+    cout << "Received message from server: " << str_data << endl;
+    return n;
+}
+
 int serversock::send_values(objectData *data)
 {
     // Pack data to buffer.
@@ -110,5 +123,14 @@ int serversock::send_values(objectData *data)
         cout << "Data sent!" << endl;
     }
         
+    return 0;
+}
+
+// Short messages communication.
+int serversock::send_values(string data)
+{
+    char buffer[1024];
+    memcpy(buffer, data.c_str(),data.size());
+    n = send(sockfd, buffer, data.size(), 0);
     return 0;
 }
