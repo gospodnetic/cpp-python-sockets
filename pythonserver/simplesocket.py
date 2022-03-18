@@ -33,25 +33,33 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as server_socket:
     connection, client_address = server_socket.accept()
     # Infinite while loop is used to loop over blocking calls to connection.recv()
     # NOTE: again, we use only one connection to one client which can send and recv.
+    image_width = 0
+    image_height = 0
     image_size = 0
     with connection:
         print("Connected to client:", client_address)
         while True:
+            # Read recv() data.
             data = connection.recv(RECV_BUFFER_SIZE)
             bytes_encoding = json.detect_encoding(data)
             txt = data.decode(bytes_encoding)
+            # Based on prefix decide:
             if txt.startswith("SIZE"):
                 tmp = txt.split(" ")
-                image_size = int(tmp[1])
-                print("Client sent image size:", image_size)
+                image_width = int(tmp[1])
+                image_height = int(tmp[2])
+                image_size = image_width * image_height
+                print("Client sent image size:", image_width, image_height)
                 connection.sendall(pack_string("GOT SIZE"))
+                # NOW set new buffer size because we are expecting image in the next recv()!
+                RECV_BUFFER_SIZE = image_size
             elif txt.startswith("BYE"):
                 print("Client sent 'BYE'. Shutting connection down.")
                 connection.shutdown(socket.SHUT_RDWR)
                 break
             else:
-                # Await for image.
-                data = connection.recv(image_size)
+                # In this case "data" contains image!
+                print(data)
                 print("Client sent image!")
                 connection.sendall(pack_string("GOT IMAGE"))
                 # Perform processing on image.
@@ -61,11 +69,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as server_socket:
                 # Send image back.
                 # TODO.
                 print("Sending image back to the client")
-                #connection.sendall(data)
-                # Shutting connection down.
-                print("Shutting connection down and exiting...")
-                connection.shutdown()
-                break
+                # NOW return the old buffer size because we can expect "SIZE" or "BYE" in next recv()!
+                RECV_BUFFER_SIZE = 1024
+                # sock.shutdown() here and new connection start in while loop?
+
     print("Closing connection.")
     connection.close()
 

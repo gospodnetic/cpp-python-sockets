@@ -14,6 +14,8 @@
 #include <iostream>
 #include <string>
 
+// STB image.
+#include "image.h"
 
 using namespace std;
 using namespace serversock;
@@ -22,13 +24,20 @@ struct serversock::objectData data;
 
 int main(int argc, char *argv[]) 
 {
+    // Read image.
+    string path = "../client_data/IEEE_spring.png";
+    uint8_t* rgb_image;
+    int width, height, bpp;
+    read_image(path, rgb_image, &width, &height, &bpp);
+    cout << "Client read image with resolution: " << width << "x" << height <<" bpp " << bpp << endl;
+
     // Create connection.
     serversock::createConnection();
 
     // Send the size of time image.
-    int size = 1024 * 1024;
-    cout << "Sending image size: " << size << " to server..." << endl;
-    string size_message = "SIZE " + to_string(size) + "\n";
+    int size = width * height; // bpp?
+    cout << "Sending image size: " << to_string(width) + "x" + to_string(height) << " to server..." << endl;
+    string size_message = "SIZE: " + to_string(width) + " " + to_string(height) + "\n";
     serversock::send_values(size_message);
 
     // Listen for server response.
@@ -43,8 +52,25 @@ int main(int argc, char *argv[])
     }
 
     // Send image.
-    // TODO.
     cout << "Sending image to server..." << endl;
+    int img_size = width * height;
+    // TODO.
+    string dummy = "DUMMY";
+    serversock::send_values(dummy);
+    //int n = serversock::send_values(rgb_image, img_size);
+
+    // Wait for server to confirm that image has been received.
+    cout << "Waiting for server image confirmation..." << endl;
+    server_listen = true;
+    while(server_listen)
+    {
+        int msg_size = serversock::read_values();
+        if (msg_size > 0)
+        {
+            server_listen = false;
+        }
+    }
+
 
     // Wait for image from server.
     server_listen = true;
@@ -68,4 +94,5 @@ int main(int argc, char *argv[])
     cout << "Closing connection and exiting..." << endl;
     serversock::close_connection();
     return 0;
+
 }

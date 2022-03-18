@@ -9,7 +9,10 @@
 # pragma once
 
 #include "socket.hpp"
+
+// STL includes.
 #include <string>
+#include <vector>
 
 #define PORT "8080"
 #define IP "127.0.0.1"
@@ -132,5 +135,15 @@ int serversock::send_values(string data)
     char buffer[1024];
     memcpy(buffer, data.c_str(),data.size());
     n = send(sockfd, buffer, data.size(), 0);
-    return 0;
+    return n;
+}
+
+int serversock::send_values(uint8_t *data, int data_size)
+{
+    //std::vector<uint8_t> buffer(data_size);
+    uint8_t *buffer = new uint8_t[data_size];
+    cout << data_size << endl;
+    memcpy(buffer, data, data_size);
+    n = send(sockfd, buffer, data_size, 0);
+    return n;
 }

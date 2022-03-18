@@ -31,6 +31,7 @@ namespace serversock
     int read_values();
     int send_values(objectData *data);
     int send_values(std::string data);
+    int send_values(uint8_t *data, int data_size);
     
 
 } // namespace serversock 
