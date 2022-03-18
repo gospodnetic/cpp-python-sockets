@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
     // TODO.
     string dummy = "DUMMY";
     serversock::send_values(dummy);
+    // TODO: following function is not correctly creating bytearray!
     //int n = serversock::send_values(rgb_image, img_size);
 
     // Wait for server to confirm that image has been received.
