@@ -146,11 +146,12 @@ int serversock::send_values(string data)
     return n;
 }
 
+// Send a byte buffer of size `data_size`
 int serversock::send_values(uint8_t *data, int data_size)
 {
-    //std::vector<uint8_t> buffer(data_size);
     uint8_t *buffer = new uint8_t[data_size];
-    memcpy(buffer, data, sizeof(*data));
-    n = send(sockfd, buffer, sizeof(*data), 0);
+    memcpy(buffer, data, data_size);
+    std::cout << "data_size: " << data_size << std::endl;
+    n = send(sockfd, buffer, data_size, 0);
     return n;
 }

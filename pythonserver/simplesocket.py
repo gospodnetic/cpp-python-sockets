@@ -1,4 +1,5 @@
 
+import errno
 import socket
 import struct
 import json
@@ -39,43 +40,49 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as server_socket:
     with connection:
         print("Connected to client:", client_address)
         while True:
-            # Read recv() data.
-            data = connection.recv(RECV_BUFFER_SIZE)
-            bytes_encoding = json.detect_encoding(data)
             try:
-                txt = data.decode(bytes_encoding)
-            except:
-                txt = "IMAGE"
-            # Based on prefix decide:
-            if txt.startswith("SIZE"):
-                tmp = txt.split(" ")
-                image_width = int(tmp[1])
-                image_height = int(tmp[2])
-                image_size = image_width * image_height
-                print("Client sent image size:", image_width, image_height)
-                connection.sendall(pack_string("GOT SIZE\n"))
-                # NOW set new buffer size because we are expecting image in the next recv()!
-                RECV_BUFFER_SIZE = image_size
-            elif txt.startswith("BYE"):
-                print("Client sent 'BYE'. Shutting connection down.")
-                connection.shutdown(socket.SHUT_RDWR)
-                break
-            else:
-                # In this case "data" contains image!
-                #print(data)
-                print("Client sent image!")
-                connection.sendall(pack_string("GOT IMAGE\n"))
-                # Perform processing on image.
-                # TODO...
-                print("Server is processing image...")
-                print("Image processing done!")
-                # Send image back.
-                print("Sending image back to the client...")
-                connection.sendall(data)
-                # NOW return the old buffer size because we can expect "SIZE" or "BYE" in next recv()!
-                RECV_BUFFER_SIZE = 1024
-                # sock.shutdown() here and new connection start in while loop?
+                # Read recv() data.
+                data = connection.recv(RECV_BUFFER_SIZE)
+                bytes_encoding = json.detect_encoding(data)
+                try:
+                    txt = data.decode(bytes_encoding)
+                except:
+                    txt = "IMAGE"
+                # Based on prefix decide:
+                if txt.startswith("SIZE"):
+                    tmp = txt.split(" ")
+                    image_width = int(tmp[1])
+                    image_height = int(tmp[2])
+                    image_size = image_width * image_height
+                    print("Client sent image size:", image_width, image_height)
+                    connection.sendall(pack_string("GOT SIZE\n"))
+                    # NOW set new buffer size because we are expecting image in the next recv()!
+                    RECV_BUFFER_SIZE = image_size
+                elif txt.startswith("BYE"):
+                    print("Client sent 'BYE'. Shutting connection down.")
+                    connection.shutdown(socket.SHUT_RDWR)
+                    break
+                else:
+                    # In this case "data" contains image!
+                    #print(data)
+                    print("Client sent image!")
+                    connection.sendall(pack_string("GOT IMAGE\n"))
+                    # Perform processing on image.
+                    # TODO...
+                    print("Server is processing image...")
+                    print("Image processing done!")
+                    # Send image back.
+                    print("Sending image back to the client...")
+                    connection.sendall(data)
+                    # NOW return the old buffer size because we can expect "SIZE" or "BYE" in next recv()!
+                    RECV_BUFFER_SIZE = 1024
+                    # sock.shutdown() here and new connection start in while loop?
 
+            # Catch broken pipe, which means the connection was closed on the other end.
+            except IOError as err:
+                print("Error: {}".format(err.errno))
+                if err.errno == errno.EPIPE:
+                    break
     print("Closing connection.")
     connection.close()
 
