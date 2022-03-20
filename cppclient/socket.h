@@ -151,7 +151,19 @@ int serversock::send_values(uint8_t *data, int data_size)
 {
     uint8_t *buffer = new uint8_t[data_size];
     memcpy(buffer, data, data_size);
-    std::cout << "data_size: " << data_size << std::endl;
     n = send(sockfd, buffer, data_size, 0);
     return n;
+}
+
+void serversock::wait_server_response()
+{
+    bool server_listen = true;
+    while(server_listen)
+    {
+        int msg_size = serversock::read_values();
+        if (msg_size > 0)
+        {
+            server_listen = false;
+        }
+    }
 }
