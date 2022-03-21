@@ -1,8 +1,9 @@
 
 //
-//  Created by Johnathan Chiu on 2/21/19.
-//  Copyright © 2019 Johnathan Chiu. All rights reserved.
+//  Modified from Johnathan Chiu on 2/21/19.
 //
+#ifndef LORENTZO_SOCKET_H
+#define LORENTZO_SOCKET_H
 
 # pragma once
 
@@ -175,3 +176,5 @@ namespace serversock
         }
     };
 }
+
+#endif // LORENTZO_SOCKET_H
