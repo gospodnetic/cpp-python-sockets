@@ -7,7 +7,6 @@
 //
 
 // Application includes.
-#include "socket.h"
 #include "socket.hpp"
 
 // STL includes.
@@ -17,8 +16,8 @@
 // STB image.
 #include "image.h"
 
-using namespace std;
-using namespace serversock;
+// using namespace std;
+// using namespace serversock;
 
 struct serversock::objectData data;
 
@@ -80,7 +79,7 @@ int main(int argc, char *argv[])
     {
         // TODO: int msg_size = serversock::read_values();
         uint8_t *data;
-        int msg_size = read_values(data, img_size);
+        int msg_size = serversock::read_values(data, img_size);
         
         if (msg_size > 0)
         {
